@@ -87,6 +87,12 @@ export default function CreateComplaintScreen() {
         description,
         image_url:
           uploadedImageUrl,
+
+        latitude:
+          location.latitude,
+
+        longitude:
+          location.longitude,
       });
 
       Alert.alert(

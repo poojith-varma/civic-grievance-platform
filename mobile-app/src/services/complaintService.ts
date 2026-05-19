@@ -4,6 +4,8 @@ type CreateComplaintPayload = {
   title: string;
   description: string;
   image_url?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export async function createComplaint(
@@ -36,6 +38,10 @@ export async function createComplaint(
             payload.description,
           image_url:
             payload.image_url || null,
+          latitude:
+            payload.latitude || null,
+          longitude:
+            payload.longitude || null,
           citizen_id: user.id,
         },
       ])

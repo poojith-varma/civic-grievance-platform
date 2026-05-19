@@ -42,7 +42,7 @@ export default function HomeScreen() {
         </Text>
 
         <Text style={styles.subtitle}>
-          Home Screen
+          Smart Civic Reporting
         </Text>
 
         <View style={styles.buttonContainer}>
@@ -69,6 +69,17 @@ export default function HomeScreen() {
 
         <View style={styles.buttonContainer}>
           <Button
+            title="View Complaint Map"
+            onPress={() =>
+              navigation.navigate(
+                'ComplaintMap'
+              )
+            }
+          />
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <Button
             title="Logout"
             onPress={handleLogout}
           />
@@ -87,7 +98,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
   },
