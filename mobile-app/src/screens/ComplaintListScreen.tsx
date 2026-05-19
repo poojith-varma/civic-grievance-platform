@@ -6,6 +6,7 @@ import {
 import {
   ActivityIndicator,
   FlatList,
+  RefreshControl,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -16,6 +17,8 @@ import {
   fetchComplaints,
 } from '../services/complaintService';
 
+import { supabase } from '../services/supabase';
+
 export default function ComplaintListScreen() {
   const [complaints, setComplaints] =
     useState<any[]>([]);
@@ -23,8 +26,33 @@ export default function ComplaintListScreen() {
   const [loading, setLoading] =
     useState(true);
 
+  const [refreshing, setRefreshing] =
+    useState(false);
+
   useEffect(() => {
     loadComplaints();
+
+    const channel =
+      supabase
+        .channel('complaints-realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'complaints',
+          },
+          () => {
+            loadComplaints();
+          }
+        )
+        .subscribe();
+
+    return () => {
+      supabase.removeChannel(
+        channel
+      );
+    };
   }, []);
 
   async function loadComplaints() {
@@ -37,38 +65,120 @@ export default function ComplaintListScreen() {
       console.log(error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
+    }
+  }
+
+  async function onRefresh() {
+    setRefreshing(true);
+
+    await loadComplaints();
+  }
+
+  function formatDate(date: string) {
+    return new Date(date).toLocaleString();
+  }
+
+  function getStatusStyle(status: string) {
+    switch (status) {
+      case 'resolved':
+        return {
+          backgroundColor: '#d4edda',
+          textColor: '#155724',
+        };
+
+      case 'in_progress':
+        return {
+          backgroundColor: '#cce5ff',
+          textColor: '#004085',
+        };
+
+      default:
+        return {
+          backgroundColor: '#fff3cd',
+          textColor: '#856404',
+        };
     }
   }
 
   if (loading) {
     return (
       <SafeAreaView style={styles.center}>
-        <ActivityIndicator />
+        <ActivityIndicator size="large" />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
+      <Text style={styles.screenTitle}>
+        My Complaints
+      </Text>
+
       <FlatList
         data={complaints}
         keyExtractor={(item) => item.id}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
         contentContainerStyle={{
           padding: 20,
         }}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.title}>
-              {item.title}
-            </Text>
+        renderItem={({ item }) => {
+          const statusStyle =
+            getStatusStyle(
+              item.status
+            );
 
-            <Text style={styles.description}>
-              {item.description}
-            </Text>
-          </View>
-        )}
+          return (
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.title}>
+                  {item.title}
+                </Text>
+
+                <View
+                  style={[
+                    styles.statusBadge,
+                    {
+                      backgroundColor:
+                        statusStyle.backgroundColor,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.statusText,
+                      {
+                        color:
+                          statusStyle.textColor,
+                      },
+                    ]}
+                  >
+                    {item.status || 'pending'}
+                  </Text>
+                </View>
+              </View>
+
+              <Text
+                style={styles.description}
+              >
+                {item.description}
+              </Text>
+
+              <Text style={styles.date}>
+                {formatDate(
+                  item.created_at
+                )}
+              </Text>
+            </View>
+          );
+        }}
         ListEmptyComponent={
-          <Text>
+          <Text style={styles.emptyText}>
             No complaints found
           </Text>
         }
@@ -80,7 +190,7 @@ export default function ComplaintListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f4f6f8',
   },
 
   center: {
@@ -89,21 +199,72 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  screenTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    marginTop: 20,
+    marginLeft: 20,
+  },
+
   card: {
-    backgroundColor: '#f5f5f5',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 18,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+
+    elevation: 3,
+  },
+
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent:
+      'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
 
   title: {
     fontSize: 18,
     fontWeight: '700',
-    marginBottom: 8,
+    flex: 1,
+    marginRight: 10,
+  },
+
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+
+  statusText: {
+    fontWeight: '600',
+    fontSize: 12,
+    textTransform: 'capitalize',
   },
 
   description: {
     fontSize: 15,
     color: '#555',
+    lineHeight: 22,
+    marginBottom: 14,
+  },
+
+  date: {
+    fontSize: 12,
+    color: '#888',
+  },
+
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: '#777',
   },
 });

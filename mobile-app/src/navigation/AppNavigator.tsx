@@ -15,6 +15,7 @@ import HomeScreen from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
 import CreateComplaintScreen from '../screens/CreateComplaintScreen';
 import ComplaintListScreen from '../screens/ComplaintListScreen';
+import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
 
 import {
   getCurrentSession,
@@ -90,6 +91,17 @@ export default function AppNavigator() {
               }
               options={{
                 title: 'My Complaints',
+              }}
+            />
+
+            <Stack.Screen
+              name="ComplaintDetail"
+              component={
+                ComplaintDetailScreen
+              }
+              options={{
+                title:
+                  'Complaint Details',
               }}
             />
           </>
