@@ -11,11 +11,16 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from 'react-native';
 
 import {
   Ionicons,
 } from '@expo/vector-icons';
+
+import {
+  PieChart,
+} from 'react-native-chart-kit';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -27,8 +32,21 @@ import {
   fetchDashboardStats,
 } from '../services/analyticsService';
 
+import {
+  lightColors,
+  darkColors,
+} from '../theme/colors';
+
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
+
+  const colorScheme =
+    useColorScheme();
+
+  const colors =
+    colorScheme === 'dark'
+      ? darkColors
+      : lightColors;
 
   const setAuthenticated =
     useAuthStore(
@@ -48,15 +66,15 @@ export default function HomeScreen() {
     useState(true);
 
   useEffect(() => {
-  loadStats();
+    loadStats();
 
-  const subscription =
-    setInterval(() => {
-      loadStats();
-    }, 3000);
+    const subscription =
+      setInterval(() => {
+        loadStats();
+      }, 3000);
 
-  return () =>
-    clearInterval(subscription);
+    return () =>
+      clearInterval(subscription);
   }, []);
 
   async function loadStats() {
@@ -87,7 +105,15 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loader}>
+      <View
+        style={[
+          styles.loader,
+          {
+            backgroundColor:
+              colors.background,
+          },
+        ]}
+      >
         <ActivityIndicator
           size="large"
         />
@@ -97,95 +123,278 @@ export default function HomeScreen() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            colors.background,
+        },
+      ]}
       contentContainerStyle={{
         paddingBottom: 40,
       }}
     >
       <View style={styles.header}>
-        <Text style={styles.welcome}>
+        <Text
+          style={[
+            styles.welcome,
+            {
+              color:
+                colors.subText,
+            },
+          ]}
+        >
           👋 Welcome Back
         </Text>
 
-        <Text style={styles.title}>
+        <Text
+          style={[
+            styles.title,
+            {
+              color: colors.text,
+            },
+          ]}
+        >
           CivicLens Dashboard
         </Text>
       </View>
 
+      {/* FIRST ROW */}
       <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              backgroundColor:
+                colors.card,
+            },
+          ]}
+        >
           <Ionicons
             name="document-text"
             size={30}
-            color="#007bff"
+            color={colors.primary}
           />
 
-          <Text style={styles.statNumber}>
+          <Text
+            style={[
+              styles.statNumber,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
             {stats.total}
           </Text>
 
-          <Text style={styles.statLabel}>
+          <Text
+            style={[
+              styles.statLabel,
+              {
+                color:
+                  colors.subText,
+              },
+            ]}
+          >
             Total Complaints
           </Text>
         </View>
 
-        <View style={styles.statCard}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              backgroundColor:
+                colors.card,
+            },
+          ]}
+        >
           <Ionicons
             name="checkmark-circle"
             size={30}
             color="#28a745"
           />
 
-          <Text style={styles.statNumber}>
+          <Text
+            style={[
+              styles.statNumber,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
             {stats.resolved}
           </Text>
 
-          <Text style={styles.statLabel}>
+          <Text
+            style={[
+              styles.statLabel,
+              {
+                color:
+                  colors.subText,
+              },
+            ]}
+          >
             Resolved
           </Text>
         </View>
       </View>
 
+      {/* SECOND ROW */}
       <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              backgroundColor:
+                colors.card,
+            },
+          ]}
+        >
           <Ionicons
             name="time"
             size={30}
             color="#ff9800"
           />
 
-          <Text style={styles.statNumber}>
+          <Text
+            style={[
+              styles.statNumber,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
             {stats.pending}
           </Text>
 
-          <Text style={styles.statLabel}>
+          <Text
+            style={[
+              styles.statLabel,
+              {
+                color:
+                  colors.subText,
+              },
+            ]}
+          >
             Pending
           </Text>
         </View>
 
-        <View style={styles.statCard}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              backgroundColor:
+                colors.card,
+            },
+          ]}
+        >
           <Ionicons
             name="construct"
             size={30}
             color="#6f42c1"
           />
 
-          <Text style={styles.statNumber}>
+          <Text
+            style={[
+              styles.statNumber,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
             {stats.inProgress}
           </Text>
 
-          <Text style={styles.statLabel}>
+          <Text
+            style={[
+              styles.statLabel,
+              {
+                color:
+                  colors.subText,
+              },
+            ]}
+          >
             In Progress
           </Text>
         </View>
       </View>
+      
+      <Text
+  style={[
+    styles.sectionTitle,
+    {
+      color: colors.text,
+    },
+  ]}
+>
+  Complaint Analytics
+</Text>
 
-      <Text style={styles.sectionTitle}>
+<PieChart
+  data={[
+    {
+      name: 'Pending',
+      population: stats.pending,
+      color: '#ff9800',
+      legendFontColor:
+        colors.text,
+      legendFontSize: 14,
+    },
+    {
+      name: 'In Progress',
+      population:
+        stats.inProgress,
+      color: '#6f42c1',
+      legendFontColor:
+        colors.text,
+      legendFontSize: 14,
+    },
+    {
+      name: 'Resolved',
+      population:
+        stats.resolved,
+      color: '#28a745',
+      legendFontColor:
+        colors.text,
+      legendFontSize: 14,
+    },
+  ]}
+  width={320}
+  height={220}
+  chartConfig={{
+    color: () => colors.text,
+  }}
+  accessor="population"
+  backgroundColor="transparent"
+  paddingLeft="15"
+  absolute
+/>
+
+      <Text
+        style={[
+          styles.sectionTitle,
+          {
+            color: colors.text,
+          },
+        ]}
+      >
         Quick Actions
       </Text>
 
       <TouchableOpacity
-        style={styles.actionCard}
+        style={[
+          styles.actionCard,
+          {
+            backgroundColor:
+              colors.card,
+          },
+        ]}
         onPress={() =>
           navigation.navigate(
             'CreateTab'
@@ -195,18 +404,30 @@ export default function HomeScreen() {
         <Ionicons
           name="add-circle"
           size={32}
-          color="#007bff"
+          color={colors.primary}
         />
 
         <View style={styles.actionText}>
-          <Text style={styles.actionTitle}>
+          <Text
+            style={[
+              styles.actionTitle,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
             Create Complaint
           </Text>
 
           <Text
-            style={
-              styles.actionSubtitle
-            }
+            style={[
+              styles.actionSubtitle,
+              {
+                color:
+                  colors.subText,
+              },
+            ]}
           >
             Report civic issues instantly
           </Text>
@@ -214,7 +435,13 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.actionCard}
+        style={[
+          styles.actionCard,
+          {
+            backgroundColor:
+              colors.card,
+          },
+        ]}
         onPress={() =>
           navigation.navigate(
             'ComplaintsTab'
@@ -228,14 +455,26 @@ export default function HomeScreen() {
         />
 
         <View style={styles.actionText}>
-          <Text style={styles.actionTitle}>
+          <Text
+            style={[
+              styles.actionTitle,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
             View Complaints
           </Text>
 
           <Text
-            style={
-              styles.actionSubtitle
-            }
+            style={[
+              styles.actionSubtitle,
+              {
+                color:
+                  colors.subText,
+              },
+            ]}
           >
             Track complaint progress
           </Text>
@@ -243,7 +482,13 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.actionCard}
+        style={[
+          styles.actionCard,
+          {
+            backgroundColor:
+              colors.card,
+          },
+        ]}
         onPress={() =>
           navigation.navigate(
             'MapTab'
@@ -257,14 +502,26 @@ export default function HomeScreen() {
         />
 
         <View style={styles.actionText}>
-          <Text style={styles.actionTitle}>
+          <Text
+            style={[
+              styles.actionTitle,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
             Smart City Map
           </Text>
 
           <Text
-            style={
-              styles.actionSubtitle
-            }
+            style={[
+              styles.actionSubtitle,
+              {
+                color:
+                  colors.subText,
+              },
+            ]}
           >
             Visualize civic complaints
           </Text>
@@ -292,7 +549,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f6f8',
     padding: 20,
   },
 
@@ -309,7 +565,6 @@ const styles = StyleSheet.create({
 
   welcome: {
     fontSize: 18,
-    color: '#666',
   },
 
   title: {
@@ -326,7 +581,6 @@ const styles = StyleSheet.create({
   },
 
   statCard: {
-    backgroundColor: '#fff',
     width: '48%',
     padding: 20,
     borderRadius: 20,
@@ -351,7 +605,6 @@ const styles = StyleSheet.create({
 
   statLabel: {
     marginTop: 6,
-    color: '#666',
     textAlign: 'center',
   },
 
@@ -362,7 +615,6 @@ const styles = StyleSheet.create({
   },
 
   actionCard: {
-    backgroundColor: '#fff',
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
@@ -391,7 +643,6 @@ const styles = StyleSheet.create({
 
   actionSubtitle: {
     marginTop: 4,
-    color: '#666',
   },
 
   logoutButton: {

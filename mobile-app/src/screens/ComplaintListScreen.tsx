@@ -12,6 +12,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from 'react-native';
 
 import {
@@ -24,8 +25,21 @@ import {
 
 import { supabase } from '../services/supabase';
 
+import {
+  lightColors,
+  darkColors,
+} from '../theme/colors';
+
 export default function ComplaintListScreen() {
   const navigation = useNavigation<any>();
+
+  const colorScheme =
+    useColorScheme();
+
+  const colors =
+    colorScheme === 'dark'
+      ? darkColors
+      : lightColors;
 
   const [complaints, setComplaints] =
     useState<any[]>([]);
@@ -110,15 +124,38 @@ export default function ComplaintListScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView
+        style={[
+          styles.center,
+          {
+            backgroundColor:
+              colors.background,
+          },
+        ]}
+      >
         <ActivityIndicator size="large" />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.screenTitle}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            colors.background,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.screenTitle,
+          {
+            color: colors.text,
+          },
+        ]}
+      >
         My Complaints
       </Text>
 
@@ -152,9 +189,25 @@ export default function ComplaintListScreen() {
                 )
               }
             >
-              <View style={styles.card}>
+              <View
+                style={[
+                  styles.card,
+                  {
+                    backgroundColor:
+                      colors.card,
+                  },
+                ]}
+              >
                 <View style={styles.cardHeader}>
-                  <Text style={styles.title}>
+                  <Text
+                    style={[
+                      styles.title,
+                      {
+                        color:
+                          colors.text,
+                      },
+                    ]}
+                  >
                     {item.title}
                   </Text>
 
@@ -183,12 +236,26 @@ export default function ComplaintListScreen() {
                 </View>
 
                 <Text
-                  style={styles.description}
+                  style={[
+                    styles.description,
+                    {
+                      color:
+                        colors.subText,
+                    },
+                  ]}
                 >
                   {item.description}
                 </Text>
 
-                <Text style={styles.date}>
+                <Text
+                  style={[
+                    styles.date,
+                    {
+                      color:
+                        colors.subText,
+                    },
+                  ]}
+                >
                   {formatDate(
                     item.created_at
                   )}
@@ -198,7 +265,15 @@ export default function ComplaintListScreen() {
           );
         }}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>
+          <Text
+            style={[
+              styles.emptyText,
+              {
+                color:
+                  colors.subText,
+              },
+            ]}
+          >
             No complaints found
           </Text>
         }
@@ -210,7 +285,6 @@ export default function ComplaintListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f6f8',
   },
 
   center: {
@@ -227,7 +301,6 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 18,
     marginBottom: 18,
@@ -272,19 +345,16 @@ const styles = StyleSheet.create({
 
   description: {
     fontSize: 15,
-    color: '#555',
     lineHeight: 22,
     marginBottom: 14,
   },
 
   date: {
     fontSize: 12,
-    color: '#888',
   },
 
   emptyText: {
     textAlign: 'center',
     marginTop: 40,
-    color: '#777',
   },
 });

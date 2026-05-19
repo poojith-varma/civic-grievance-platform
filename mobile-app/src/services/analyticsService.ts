@@ -35,10 +35,13 @@ export async function fetchDashboardStats() {
     ).length;
 
   const pending =
-    complaints.filter(
-      (item) =>
-        item.status ===
-        'pending'
+  complaints.filter(
+    (item) =>
+      !item.status ||
+      item.status ===
+        'open' ||
+      item.status ===
+        'pending_ai'
     ).length;
 
   return {
