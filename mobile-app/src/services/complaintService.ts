@@ -45,3 +45,19 @@ export async function createComplaint(
 
   return data;
 }
+
+export async function fetchComplaints() {
+  const { data, error } =
+    await supabase
+      .from('complaints')
+      .select('*')
+      .order('created_at', {
+        ascending: false,
+      });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}

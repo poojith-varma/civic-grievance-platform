@@ -58,6 +58,17 @@ export default function HomeScreen() {
 
         <View style={styles.buttonContainer}>
           <Button
+            title="View Complaints"
+            onPress={() =>
+              navigation.navigate(
+                'ComplaintList'
+              )
+            }
+          />
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <Button
             title="Logout"
             onPress={handleLogout}
           />
