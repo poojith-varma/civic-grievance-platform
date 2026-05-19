@@ -80,16 +80,13 @@ export default function CreateComplaintScreen() {
           await uploadImageToCloudinary(
             imageUri
           );
-
-        console.log(
-          'Uploaded Image URL:',
-          uploadedImageUrl
-        );
       }
 
       await createComplaint({
         title,
         description,
+        image_url:
+          uploadedImageUrl,
       });
 
       Alert.alert(

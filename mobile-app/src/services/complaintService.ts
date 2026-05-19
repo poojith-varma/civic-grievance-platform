@@ -3,6 +3,7 @@ import { supabase } from './supabase';
 type CreateComplaintPayload = {
   title: string;
   description: string;
+  image_url?: string | null;
 };
 
 export async function createComplaint(
@@ -33,6 +34,8 @@ export async function createComplaint(
           title: payload.title,
           description:
             payload.description,
+          image_url:
+            payload.image_url || null,
           citizen_id: user.id,
         },
       ])

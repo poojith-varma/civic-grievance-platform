@@ -1,22 +1,25 @@
 import {
-  RouteProp,
-} from '@react-navigation/native';
-
-import {
+  Image,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 
 type Props = {
-  route: RouteProp<any>;
+  route: {
+    params: {
+      complaint: any;
+    };
+  };
 };
 
 export default function ComplaintDetailScreen({
   route,
 }: Props) {
-  const complaint = route?.params?.complaint;
+  const { complaint } =
+    route.params;
 
   function formatDate(date: string) {
     return new Date(date).toLocaleString();
@@ -24,36 +27,54 @@ export default function ComplaintDetailScreen({
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>
-          {complaint.title}
-        </Text>
+      <ScrollView
+        contentContainerStyle={{
+          padding: 20,
+        }}
+      >
+        <View style={styles.card}>
+          <Text style={styles.title}>
+            {complaint.title}
+          </Text>
 
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>
-            {complaint.status ||
-              'pending'}
+          <View style={styles.statusBadge}>
+            <Text style={styles.statusText}>
+              {complaint.status ||
+                'pending'}
+            </Text>
+          </View>
+
+          {complaint.image_url && (
+            <Image
+              source={{
+                uri:
+                  complaint.image_url,
+              }}
+              style={styles.image}
+            />
+          )}
+
+          <Text style={styles.label}>
+            Description
+          </Text>
+
+          <Text
+            style={styles.description}
+          >
+            {complaint.description}
+          </Text>
+
+          <Text style={styles.label}>
+            Created At
+          </Text>
+
+          <Text style={styles.date}>
+            {formatDate(
+              complaint.created_at
+            )}
           </Text>
         </View>
-
-        <Text style={styles.label}>
-          Description
-        </Text>
-
-        <Text style={styles.description}>
-          {complaint.description}
-        </Text>
-
-        <Text style={styles.label}>
-          Created At
-        </Text>
-
-        <Text style={styles.date}>
-          {formatDate(
-            complaint.created_at
-          )}
-        </Text>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -62,7 +83,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f4f6f8',
-    padding: 20,
   },
 
   card: {
@@ -100,6 +120,13 @@ const styles = StyleSheet.create({
     color: '#856404',
     fontWeight: '600',
     textTransform: 'capitalize',
+  },
+
+  image: {
+    width: '100%',
+    height: 240,
+    borderRadius: 16,
+    marginBottom: 24,
   },
 
   label: {

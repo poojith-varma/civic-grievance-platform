@@ -10,8 +10,13 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
+
+import {
+  useNavigation,
+} from '@react-navigation/native';
 
 import {
   fetchComplaints,
@@ -20,6 +25,8 @@ import {
 import { supabase } from '../services/supabase';
 
 export default function ComplaintListScreen() {
+  const navigation = useNavigation<any>();
+
   const [complaints, setComplaints] =
     useState<any[]>([]);
 
@@ -134,47 +141,60 @@ export default function ComplaintListScreen() {
             );
 
           return (
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.title}>
-                  {item.title}
-                </Text>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() =>
+                navigation.navigate(
+                  'ComplaintDetail',
+                  {
+                    complaint: item,
+                  }
+                )
+              }
+            >
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.title}>
+                    {item.title}
+                  </Text>
 
-                <View
-                  style={[
-                    styles.statusBadge,
-                    {
-                      backgroundColor:
-                        statusStyle.backgroundColor,
-                    },
-                  ]}
-                >
-                  <Text
+                  <View
                     style={[
-                      styles.statusText,
+                      styles.statusBadge,
                       {
-                        color:
-                          statusStyle.textColor,
+                        backgroundColor:
+                          statusStyle.backgroundColor,
                       },
                     ]}
                   >
-                    {item.status || 'pending'}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.statusText,
+                        {
+                          color:
+                            statusStyle.textColor,
+                        },
+                      ]}
+                    >
+                      {item.status ||
+                        'pending'}
+                    </Text>
+                  </View>
                 </View>
+
+                <Text
+                  style={styles.description}
+                >
+                  {item.description}
+                </Text>
+
+                <Text style={styles.date}>
+                  {formatDate(
+                    item.created_at
+                  )}
+                </Text>
               </View>
-
-              <Text
-                style={styles.description}
-              >
-                {item.description}
-              </Text>
-
-              <Text style={styles.date}>
-                {formatDate(
-                  item.created_at
-                )}
-              </Text>
-            </View>
+            </TouchableOpacity>
           );
         }}
         ListEmptyComponent={
