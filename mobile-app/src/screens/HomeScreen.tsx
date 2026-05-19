@@ -7,10 +7,14 @@ import {
   View,
 } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
+
 import { signOut } from '../services/authService';
 import { useAuthStore } from '../store/authStore';
 
 export default function HomeScreen() {
+  const navigation = useNavigation<any>();
+
   const setAuthenticated =
     useAuthStore(
       (state) =>
@@ -40,6 +44,17 @@ export default function HomeScreen() {
         <Text style={styles.subtitle}>
           Home Screen
         </Text>
+
+        <View style={styles.buttonContainer}>
+          <Button
+            title="Create Complaint"
+            onPress={() =>
+              navigation.navigate(
+                'CreateComplaint'
+              )
+            }
+          />
+        </View>
 
         <View style={styles.buttonContainer}>
           <Button
@@ -74,6 +89,6 @@ const styles = StyleSheet.create({
   },
 
   buttonContainer: {
-    marginTop: 24,
+    marginTop: 20,
   },
 });

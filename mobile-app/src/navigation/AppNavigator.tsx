@@ -13,6 +13,7 @@ import {
 
 import HomeScreen from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
+import CreateComplaintScreen from '../screens/CreateComplaintScreen';
 
 import {
   getCurrentSession,
@@ -68,10 +69,19 @@ export default function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator>
         {isAuthenticated ? (
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-          />
+          <>
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
+            />
+
+            <Stack.Screen
+              name="CreateComplaint"
+              component={
+                CreateComplaintScreen
+              }
+            />
+          </>
         ) : (
           <Stack.Screen
             name="Login"
