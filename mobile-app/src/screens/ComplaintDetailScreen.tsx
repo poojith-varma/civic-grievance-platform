@@ -1,4 +1,8 @@
+import { useState } from 'react';
+
 import {
+  Alert,
+  Button,
   Image,
   SafeAreaView,
   ScrollView,
@@ -6,6 +10,10 @@ import {
   Text,
   View,
 } from 'react-native';
+
+import {
+  updateComplaintStatus,
+} from '../services/statusService';
 
 type Props = {
   route: {
@@ -18,12 +26,63 @@ type Props = {
 export default function ComplaintDetailScreen({
   route,
 }: Props) {
-  const { complaint } =
-    route.params;
+  const [complaint, setComplaint] =
+    useState(route.params.complaint);
+
+  async function handleStatusUpdate(
+    status: string
+  ) {
+    try {
+      const updatedComplaint =
+        await updateComplaintStatus(
+          complaint.id,
+          status
+        );
+
+      setComplaint(updatedComplaint);
+
+      Alert.alert(
+        'Success',
+        `Complaint marked as ${status}`
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Update Failed',
+        error.message
+      );
+    }
+  }
 
   function formatDate(date: string) {
     return new Date(date).toLocaleString();
   }
+
+  function getStatusStyle(status: string) {
+    switch (status) {
+      case 'resolved':
+        return {
+          backgroundColor: '#d4edda',
+          textColor: '#155724',
+        };
+
+      case 'in_progress':
+        return {
+          backgroundColor: '#cce5ff',
+          textColor: '#004085',
+        };
+
+      default:
+        return {
+          backgroundColor: '#fff3cd',
+          textColor: '#856404',
+        };
+    }
+  }
+
+  const statusStyle =
+    getStatusStyle(
+      complaint.status
+    );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -37,8 +96,24 @@ export default function ComplaintDetailScreen({
             {complaint.title}
           </Text>
 
-          <View style={styles.statusBadge}>
-            <Text style={styles.statusText}>
+          <View
+            style={[
+              styles.statusBadge,
+              {
+                backgroundColor:
+                  statusStyle.backgroundColor,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.statusText,
+                {
+                  color:
+                    statusStyle.textColor,
+                },
+              ]}
+            >
               {complaint.status ||
                 'pending'}
             </Text>
@@ -73,6 +148,28 @@ export default function ComplaintDetailScreen({
               complaint.created_at
             )}
           </Text>
+
+          <View style={styles.button}>
+            <Button
+              title="Mark In Progress"
+              onPress={() =>
+                handleStatusUpdate(
+                  'in_progress'
+                )
+              }
+            />
+          </View>
+
+          <View style={styles.button}>
+            <Button
+              title="Mark Resolved"
+              onPress={() =>
+                handleStatusUpdate(
+                  'resolved'
+                )
+              }
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -109,7 +206,6 @@ const styles = StyleSheet.create({
 
   statusBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#fff3cd',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
@@ -117,7 +213,6 @@ const styles = StyleSheet.create({
   },
 
   statusText: {
-    color: '#856404',
     fontWeight: '600',
     textTransform: 'capitalize',
   },
@@ -146,5 +241,10 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 24,
+  },
+
+  button: {
+    marginBottom: 16,
   },
 });

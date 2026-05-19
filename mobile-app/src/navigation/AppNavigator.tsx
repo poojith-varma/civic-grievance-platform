@@ -11,12 +11,11 @@ import {
   createNativeStackNavigator,
 } from '@react-navigation/native-stack';
 
-import HomeScreen from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
-import CreateComplaintScreen from '../screens/CreateComplaintScreen';
-import ComplaintListScreen from '../screens/ComplaintListScreen';
+
 import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
-import ComplaintMapScreen from '../screens/ComplaintMapScreen';
+
+import BottomTabNavigator from './BottomTabNavigator';
 
 import {
   getCurrentSession,
@@ -74,24 +73,12 @@ export default function AppNavigator() {
         {isAuthenticated ? (
           <>
             <Stack.Screen
-              name="Home"
-              component={HomeScreen}
-            />
-
-            <Stack.Screen
-              name="CreateComplaint"
+              name="MainTabs"
               component={
-                CreateComplaintScreen
-              }
-            />
-
-            <Stack.Screen
-              name="ComplaintList"
-              component={
-                ComplaintListScreen
+                BottomTabNavigator
               }
               options={{
-                title: 'My Complaints',
+                headerShown: false,
               }}
             />
 
@@ -103,17 +90,6 @@ export default function AppNavigator() {
               options={{
                 title:
                   'Complaint Details',
-              }}
-            />
-
-            <Stack.Screen
-              name="ComplaintMap"
-              component={
-                ComplaintMapScreen
-              }
-              options={{
-                title:
-                  'Complaint Map',
               }}
             />
           </>
