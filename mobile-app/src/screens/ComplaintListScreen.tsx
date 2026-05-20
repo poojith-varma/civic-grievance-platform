@@ -156,7 +156,7 @@ export default function ComplaintListScreen() {
           },
         ]}
       >
-        My Complaints
+        Complaints
       </Text>
 
       <FlatList

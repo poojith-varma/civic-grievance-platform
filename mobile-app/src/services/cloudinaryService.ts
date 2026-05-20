@@ -9,6 +9,12 @@ export async function uploadImageToCloudinary(
     process.env
       .EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
+  if (!cloudName || !uploadPreset) {
+    throw new Error(
+      'Cloudinary environment variables missing'
+    );
+  }
+
   const formData = new FormData();
 
   formData.append('file', {
@@ -19,7 +25,7 @@ export async function uploadImageToCloudinary(
 
   formData.append(
     'upload_preset',
-    uploadPreset || ''
+    uploadPreset
   );
 
   const response = await fetch(
@@ -30,9 +36,12 @@ export async function uploadImageToCloudinary(
     }
   );
 
-  const data = await response.json();
+  const data =
+    await response.json();
 
   if (!response.ok) {
+    console.log(data);
+
     throw new Error(
       data.error?.message ||
         'Image upload failed'
