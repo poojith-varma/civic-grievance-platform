@@ -24,6 +24,8 @@ import {
 
 import {
   PieChart,
+  LineChart,
+  BarChart,
 } from 'react-native-chart-kit';
 
 import {
@@ -73,7 +75,7 @@ export default function HomeScreen() {
     useState<any>(null);
 
   const [stats, setStats] =
-    useState({
+    useState<any>({
       total: 0,
       resolved: 0,
       rejected: 0,
@@ -87,6 +89,11 @@ export default function HomeScreen() {
       topAreaCount: 0,
 
       topWorkerCount: 0,
+
+      trendLabels: [],
+      trendData: [],
+
+      areaDistribution: [],
     });
 
   const [loading, setLoading] =
@@ -593,7 +600,7 @@ export default function HomeScreen() {
         },
       ]}
       contentContainerStyle={{
-        paddingBottom: 50,
+        paddingBottom: 60,
       }}
       showsVerticalScrollIndicator={
         false
@@ -662,9 +669,11 @@ export default function HomeScreen() {
               alignItems:
                 'center',
 
-              position: 'absolute',
-                right: 14,
-                top: 5,
+              position:
+                'absolute',
+
+              right: 0,
+              top: 10,
             }}
           >
             <Ionicons
@@ -798,6 +807,85 @@ export default function HomeScreen() {
         ))}
       </View>
 
+      {/* TREND CHART */}
+      <View
+        style={[
+          styles.chartCard,
+          {
+            backgroundColor:
+              colorScheme ===
+              'dark'
+                ? '#0B1727'
+                : colors.card,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color:
+                colors.text,
+            },
+          ]}
+        >
+          📈 Monthly Complaint Trends
+        </Text>
+
+        <LineChart
+          data={{
+            labels:
+              stats.trendLabels,
+            datasets: [
+              {
+                data:
+                  stats.trendData,
+              },
+            ],
+          }}
+          width={
+            screenWidth - 70
+          }
+          height={240}
+          yAxisInterval={1}
+          chartConfig={{
+            backgroundColor:
+              'transparent',
+
+            backgroundGradientFrom:
+              'transparent',
+
+            backgroundGradientTo:
+              'transparent',
+
+            decimalPlaces: 0,
+
+            color: (
+              opacity = 1
+            ) =>
+              `rgba(79,124,255,${opacity})`,
+
+            labelColor:
+              (
+                opacity = 1
+              ) =>
+                colorScheme ===
+                'dark'
+                  ? `rgba(255,255,255,${opacity})`
+                  : `rgba(0,0,0,${opacity})`,
+
+            propsForDots: {
+              r: '5',
+            },
+          }}
+          bezier
+          style={{
+            borderRadius: 20,
+            marginTop: 10,
+          }}
+        />
+      </View>
+
       {/* INSIGHT CARDS */}
       <View
         style={{
@@ -910,19 +998,101 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* PREMIUM CHART */}
+      {/* AREA DISTRIBUTION */}
       <View
         style={[
-          styles.areaCard,
+          styles.chartCard,
           {
             backgroundColor:
               colorScheme ===
               'dark'
                 ? '#0B1727'
                 : colors.card,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color:
+                colors.text,
+            },
+          ]}
+        >
+          🏙️ Area Distribution
+        </Text>
 
-            flexDirection:
-              'column',
+        <BarChart
+          data={{
+            labels:
+              stats.areaDistribution.map(
+                (
+                  item: any
+                ) =>
+                  item.area
+              ),
+
+            datasets: [
+              {
+                data:
+                  stats.areaDistribution.map(
+                    (
+                      item: any
+                    ) =>
+                      item.count
+                  ),
+              },
+            ],
+          }}
+          width={
+            screenWidth - 70
+          }
+          height={260}
+          yAxisLabel=""
+          chartConfig={{
+            backgroundColor:
+              'transparent',
+
+            backgroundGradientFrom:
+              'transparent',
+
+            backgroundGradientTo:
+              'transparent',
+
+            decimalPlaces: 0,
+
+            color: (
+              opacity = 1
+            ) =>
+              `rgba(20,184,166,${opacity})`,
+
+            labelColor:
+              (
+                opacity = 1
+              ) =>
+                colorScheme ===
+                'dark'
+                  ? `rgba(255,255,255,${opacity})`
+                  : `rgba(0,0,0,${opacity})`,
+          }}
+          style={{
+            marginTop: 10,
+            borderRadius: 20,
+          }}
+        />
+      </View>
+
+      {/* PREMIUM CHART */}
+      <View
+        style={[
+          styles.chartCard,
+          {
+            backgroundColor:
+              colorScheme ===
+              'dark'
+                ? '#0B1727'
+                : colors.card,
 
             alignItems:
               'center',
@@ -944,194 +1114,185 @@ export default function HomeScreen() {
           📊 Complaint Breakdown
         </Text>
 
+        <PieChart
+          data={[
+            {
+              name:
+                'Resolved',
+              population:
+                stats.resolved,
+              color:
+                '#22C55E',
+              legendFontColor:
+                'transparent',
+              legendFontSize: 0,
+            },
+
+            {
+              name:
+                'Active',
+              population:
+                stats.active,
+              color:
+                '#F59E0B',
+              legendFontColor:
+                'transparent',
+              legendFontSize: 0,
+            },
+
+            {
+              name:
+                'Rejected',
+              population:
+                stats.rejected,
+              color:
+                '#EF4444',
+              legendFontColor:
+                'transparent',
+              legendFontSize: 0,
+            },
+
+            {
+              name:
+                'Pending',
+              population:
+                stats.pending,
+              color:
+                '#4F7CFF',
+              legendFontColor:
+                'transparent',
+              legendFontSize: 0,
+            },
+          ]}
+          width={
+            screenWidth - 80
+          }
+          height={220}
+          chartConfig={{
+            color: () =>
+              '#000',
+          }}
+          accessor="population"
+          backgroundColor="transparent"
+          paddingLeft="20"
+          absolute
+          hasLegend={false}
+        />
+
+        {/* LEGEND */}
         <View
           style={{
-            alignItems:
-              'center',
-
-            justifyContent:
-              'center',
+            width: '100%',
+            marginTop: 10,
           }}
         >
-          <PieChart
-            data={[
-              {
-                name:
-                  'Resolved',
-                population:
-                  stats.resolved,
-                color:
-                  '#22C55E',
-                legendFontColor:
-                  'transparent',
-                legendFontSize: 0,
-              },
+          {[
+            {
+              label:
+                'Resolved',
+              value:
+                stats.resolved,
+              color:
+                '#22C55E',
+            },
 
-              {
-                name: 'Active',
-                population:
-                  stats.active,
-                color:
-                  '#F59E0B',
-                legendFontColor:
-                  'transparent',
-                legendFontSize: 0,
-              },
+            {
+              label:
+                'Active',
+              value:
+                stats.active,
+              color:
+                '#F59E0B',
+            },
 
-              {
-                name:
-                  'Rejected',
-                population:
-                  stats.rejected,
-                color:
-                  '#EF4444',
-                legendFontColor:
-                  'transparent',
-                legendFontSize: 0,
-              },
+            {
+              label:
+                'Rejected',
+              value:
+                stats.rejected,
+              color:
+                '#EF4444',
+            },
 
-              {
-                name:
-                  'Pending',
-                population:
-                  stats.pending,
-                color:
-                  '#4F7CFF',
-                legendFontColor:
-                  'transparent',
-                legendFontSize: 0,
-              },
-            ]}
-            width={
-              screenWidth - 80
-            }
-            height={220}
-            chartConfig={{
-              color: () =>
-                '#000',
-            }}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="80"
-            absolute
-            hasLegend={false}
-          />
+            {
+              label:
+                'Pending',
+              value:
+                stats.pending,
+              color:
+                '#4F7CFF',
+            },
+          ].map((item) => (
+            <View
+              key={
+                item.label
+              }
+              style={{
+                flexDirection:
+                  'row',
 
-          {/* LEGEND */}
-          <View
-            style={{
-              width: '100%',
-              marginTop: 10,
-            }}
-          >
-            {[
-              {
-                label:
-                  'Resolved',
-                value:
-                  stats.resolved,
-                color:
-                  '#22C55E',
-              },
+                alignItems:
+                  'center',
 
-              {
-                label:
-                  'Active',
-                value:
-                  stats.active,
-                color:
-                  '#F59E0B',
-              },
+                justifyContent:
+                  'space-between',
 
-              {
-                label:
-                  'Rejected',
-                value:
-                  stats.rejected,
-                color:
-                  '#EF4444',
-              },
-
-              {
-                label:
-                  'Pending',
-                value:
-                  stats.pending,
-                color:
-                  '#4F7CFF',
-              },
-            ].map((item) => (
+                marginBottom: 16,
+              }}
+            >
               <View
-                key={
-                  item.label
-                }
                 style={{
                   flexDirection:
                     'row',
 
                   alignItems:
                     'center',
-
-                  justifyContent:
-                    'space-between',
-
-                  marginBottom: 16,
                 }}
               >
                 <View
                   style={{
-                    flexDirection:
-                      'row',
+                    width: 14,
+                    height: 14,
 
-                    alignItems:
-                      'center',
+                    borderRadius: 20,
+
+                    backgroundColor:
+                      item.color,
+
+                    marginRight: 12,
                   }}
-                >
-                  <View
-                    style={{
-                      width: 14,
-                      height: 14,
-
-                      borderRadius: 20,
-
-                      backgroundColor:
-                        item.color,
-
-                      marginRight: 12,
-                    }}
-                  />
-
-                  <Text
-                    style={{
-                      color:
-                        colors.text,
-
-                      fontSize: 15,
-
-                      fontWeight:
-                        '600',
-                    }}
-                  >
-                    {item.label}
-                  </Text>
-                </View>
+                />
 
                 <Text
                   style={{
                     color:
                       colors.text,
 
-                    fontSize: 16,
+                    fontSize: 15,
 
                     fontWeight:
-                      '700',
+                      '600',
                   }}
                 >
-                  {item.value}
+                  {item.label}
                 </Text>
               </View>
-            ))}
-          </View>
+
+              <Text
+                style={{
+                  color:
+                    colors.text,
+
+                  fontSize: 16,
+
+                  fontWeight:
+                    '700',
+                }}
+              >
+                {item.value}
+              </Text>
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -1159,6 +1320,23 @@ const styles =
       padding: 30,
       marginTop: 40,
       marginBottom: 28,
+    },
+
+    chartCard: {
+      borderRadius: 28,
+      padding: 24,
+      marginBottom: 24,
+
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 8,
+      },
+
+      shadowOpacity: 0.08,
+      shadowRadius: 18,
+
+      elevation: 6,
     },
 
     heroGreeting: {
