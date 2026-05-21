@@ -606,6 +606,8 @@ export default function HomeScreen() {
         false
       }
     >
+      
+
       <LinearGradient
         colors={[
           '#0B63CE',
@@ -853,17 +855,23 @@ export default function HomeScreen() {
               'transparent',
 
             backgroundGradientFrom:
-              'transparent',
+              colorScheme === 'dark'
+              ? '#0B1727'
+              : '#FFFFFF',
 
             backgroundGradientTo:
-              'transparent',
+              colorScheme === 'dark'
+               ? '#0B1727'
+               : '#FFFFFF',
 
             decimalPlaces: 0,
 
             color: (
               opacity = 1
             ) =>
-              `rgba(79,124,255,${opacity})`,
+                colorScheme === 'dark'
+                ? `rgba(79,124,255,${opacity})`
+                : `rgba(15,108,189,${opacity})`,
 
             labelColor:
               (
@@ -1055,17 +1063,23 @@ export default function HomeScreen() {
               'transparent',
 
             backgroundGradientFrom:
-              'transparent',
+              colorScheme === 'dark'
+              ? '#0B1727'
+              : '#FFFFFF',
 
             backgroundGradientTo:
-              'transparent',
+              colorScheme === 'dark'
+               ? '#0B1727'
+               : '#FFFFFF',
 
             decimalPlaces: 0,
 
             color: (
               opacity = 1
             ) =>
-              `rgba(20,184,166,${opacity})`,
+              colorScheme === 'dark'
+               ? `rgba(20,184,166,${opacity})`
+               : `rgba(13,148,136,${opacity})`,
 
             labelColor:
               (

@@ -131,27 +131,14 @@ export async function fetchComplaints() {
   }
 
   // 👷 WORKER
-  if (role === 'worker') {
-    // GET WORKER PROFILE
-    const {
-      data: workerProfile,
-      error: profileError,
-    } = await supabase
-      .from('profiles')
-      .select('area')
-      .eq('id', user.id)
-      .single();
+if (role === 'worker') {
 
-    if (profileError) {
-      throw profileError;
-    }
-
-    // ONLY SAME AREA COMPLAINTS
-    query = query.eq(
-      'area',
-      workerProfile.area
-    );
-  }
+  // ONLY ASSIGNED COMPLAINTS
+  query = query.eq(
+    'assigned_worker_id',
+    user.id
+  );
+}
 
   // 👑 ADMIN SEES EVERYTHING
 

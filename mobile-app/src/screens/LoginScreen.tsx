@@ -80,28 +80,35 @@ export default function LoginScreen() {
           : staffRole;
 
       // ✅ SIGNUP
-      if (isSignup) {
-        await signUp(
-          email,
-          password,
-          selectedRole,
+if (isSignup) {
 
-          // ✅ ONLY WORKERS GET AREA
-          selectedRole ===
-            'worker'
-            ? area
-            : null
-        );
+  // 🚫 BLOCK STAFF REGISTRATION
+  if (portalType === 'staff') {
+    Alert.alert(
+      'Access Restricted',
+      'Staff accounts are created only by the CivicLens administration team.'
+    );
 
-        Alert.alert(
-          'Success',
-          'Account created successfully. Please login.'
-        );
+    return;
+  }
 
-        setIsSignup(false);
+  // ✅ ONLY CITIZENS CAN REGISTER
+  await signUp(
+    email,
+    password,
+    'citizen',
+    null
+  );
 
-        return;
-      }
+  Alert.alert(
+    'Success',
+    'Account created successfully. Please login.'
+  );
+
+  setIsSignup(false);
+
+  return;
+}
 
       // ✅ LOGIN
       await signIn(
@@ -156,117 +163,122 @@ export default function LoginScreen() {
         </Text>
 
         {/* PORTAL SWITCHER */}
-        <View style={styles.portalContainer}>
-          <TouchableOpacity
-            style={[
-              styles.portalButton,
-              portalType ===
-                'citizen' &&
-                styles.activePortal,
-            ]}
-            onPress={() =>
-              setPortalType(
-                'citizen'
-              )
-            }
-          >
-            <Text
-              style={[
-                styles.portalText,
-                portalType ===
-                  'citizen' &&
-                  styles.activePortalText,
-              ]}
-            >
-              Citizen Portal
-            </Text>
-          </TouchableOpacity>
+{!isSignup ? (
+  <View style={styles.portalContainer}>
+    <TouchableOpacity
+      style={[
+        styles.portalButton,
+        portalType === 'citizen' &&
+          styles.activePortal,
+      ]}
+      onPress={() =>
+        setPortalType('citizen')
+      }
+    >
+      <Text
+        style={[
+          styles.portalText,
+          portalType === 'citizen' &&
+            styles.activePortalText,
+        ]}
+      >
+        Citizen Portal
+      </Text>
+    </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.portalButton,
-              portalType ===
-                'staff' &&
-                styles.activePortal,
-            ]}
-            onPress={() =>
-              setPortalType(
-                'staff'
-              )
-            }
-          >
-            <Text
-              style={[
-                styles.portalText,
-                portalType ===
-                  'staff' &&
-                  styles.activePortalText,
-              ]}
-            >
-              Staff Portal
-            </Text>
-          </TouchableOpacity>
-        </View>
+    <TouchableOpacity
+      style={[
+        styles.portalButton,
+        portalType === 'staff' &&
+          styles.activePortal,
+      ]}
+      onPress={() =>
+        setPortalType('staff')
+      }
+    >
+      <Text
+        style={[
+          styles.portalText,
+          portalType === 'staff' &&
+            styles.activePortalText,
+        ]}
+      >
+        Staff Portal
+      </Text>
+    </TouchableOpacity>
+  </View>
+) : (
+  <View style={styles.portalContainer}>
+    <TouchableOpacity
+      style={[
+        styles.portalButton,
+        styles.activePortal,
+      ]}
+    >
+      <Text
+        style={[
+          styles.portalText,
+          styles.activePortalText,
+        ]}
+      >
+        Citizen Registration
+      </Text>
+    </TouchableOpacity>
+  </View>
+)}
 
         {/* STAFF ROLE */}
-        {portalType ===
-          'staff' && (
-            <View
-              style={
-                styles.roleContainer
-              }
-            >
-              <TouchableOpacity
-                style={[
-                  styles.roleButton,
-                  staffRole ===
-                    'worker' &&
-                    styles.activeRole,
-                ]}
-                onPress={() =>
-                  setStaffRole(
-                    'worker'
-                  )
-                }
-              >
-                <Text
-                  style={[
-                    styles.roleText,
-                    staffRole ===
-                      'worker' &&
-                      styles.activeRoleText,
-                  ]}
-                >
-                  Worker
-                </Text>
-              </TouchableOpacity>
+{portalType === 'staff' && (
+  <>
+    <View style={styles.roleContainer}>
+      <TouchableOpacity
+        style={[
+          styles.roleButton,
+          staffRole === 'worker' &&
+            styles.activeRole,
+        ]}
+        onPress={() =>
+          setStaffRole('worker')
+        }
+      >
+        <Text
+          style={[
+            styles.roleText,
+            staffRole === 'worker' &&
+              styles.activeRoleText,
+          ]}
+        >
+          Worker
+        </Text>
+      </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[
-                  styles.roleButton,
-                  staffRole ===
-                    'admin' &&
-                    styles.activeRole,
-                ]}
-                onPress={() =>
-                  setStaffRole(
-                    'admin'
-                  )
-                }
-              >
-                <Text
-                  style={[
-                    styles.roleText,
-                    staffRole ===
-                      'admin' &&
-                      styles.activeRoleText,
-                  ]}
-                >
-                  Admin
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
+      <TouchableOpacity
+        style={[
+          styles.roleButton,
+          staffRole === 'admin' &&
+            styles.activeRole,
+        ]}
+        onPress={() =>
+          setStaffRole('admin')
+        }
+      >
+        <Text
+          style={[
+            styles.roleText,
+            staffRole === 'admin' &&
+              styles.activeRoleText,
+          ]}
+        >
+          Admin
+        </Text>
+      </TouchableOpacity>
+    </View>
+
+    <Text style={styles.staffNotice}>
+      Authorized municipal personnel only
+    </Text>
+  </>
+)}
 
         {/* AREA PICKER ONLY FOR WORKERS */}
         {isSignup &&
@@ -368,19 +380,20 @@ export default function LoginScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() =>
-            setIsSignup(
-              !isSignup
-            )
-          }
-        >
-          <Text style={styles.switchText}>
-            {isSignup
-              ? 'Already have an account? Login'
-              : 'No account? Create one'}
-          </Text>
-        </TouchableOpacity>
+       {/* ✅ ONLY CITIZENS CAN REGISTER */}
+{portalType === 'citizen' && (
+  <TouchableOpacity
+    onPress={() =>
+      setIsSignup(!isSignup)
+    }
+  >
+    <Text style={styles.switchText}>
+      {isSignup
+        ? 'Already have an account? Login'
+        : 'No account? Create one'}
+    </Text>
+  </TouchableOpacity>
+)}
       </View>
     </SafeAreaView>
   );
@@ -395,6 +408,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#f4f6f8',
     padding: 20,
   },
+
+  staffNotice: {
+  textAlign: 'center',
+  color: '#666',
+  marginBottom: 18,
+  fontSize: 13,
+  fontStyle: 'italic',
+},
 
   card: {
     width: '100%',

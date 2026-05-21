@@ -20,6 +20,8 @@ import MapView, {
   Marker,
 } from 'react-native-maps';
 
+import ClusteredMapView from 'react-native-map-clustering';
+
 import {
   fetchComplaints,
 } from '../services/complaintService';
