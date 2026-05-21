@@ -1,5 +1,13 @@
 import { supabase } from './supabase';
 
+import {
+  getUserRole,
+} from './roleService';
+
+import {
+  detectArea,
+} from '../utils/detectArea';
+
 type CreateComplaintPayload = {
   title: string;
   description: string;
@@ -28,24 +36,47 @@ export async function createComplaint(
     );
   }
 
+  // ✅ AUTO DETECT AREA
+  const detectedArea =
+    payload.latitude &&
+    payload.longitude
+      ? detectArea(
+          payload.latitude,
+          payload.longitude
+        )
+      : 'Unknown';
+
   const { data, error } =
     await supabase
       .from('complaints')
       .insert([
         {
           title: payload.title,
+
           description:
             payload.description,
+
           image_url:
             payload.image_url || null,
+
           latitude:
             payload.latitude || null,
+
           longitude:
             payload.longitude || null,
+
           citizen_id: user.id,
+
+          area:
+            detectedArea,
         },
       ])
-      .select()
+      .select(`
+        *,
+        profiles:citizen_id (
+          name
+        )
+      `)
       .single();
 
   if (error) {
@@ -56,15 +87,80 @@ export async function createComplaint(
 }
 
 export async function fetchComplaints() {
+  // ✅ CURRENT USER
+  const {
+    data: sessionData,
+    error: sessionError,
+  } = await supabase.auth.getUser();
+
+  if (sessionError) {
+    throw sessionError;
+  }
+
+  const user = sessionData.user;
+
+  if (!user) {
+    throw new Error(
+      'User not authenticated'
+    );
+  }
+
+  // ✅ GET ROLE
+  const role =
+    await getUserRole();
+
+  // ✅ BASE QUERY
+  let query = supabase
+    .from('complaints')
+    .select(`
+      *,
+      profiles:citizen_id (
+        name
+      )
+    `)
+    .order('created_at', {
+      ascending: false,
+    });
+
+  // 👤 CITIZEN
+  if (role === 'citizen') {
+    query = query.eq(
+      'citizen_id',
+      user.id
+    );
+  }
+
+  // 👷 WORKER
+  if (role === 'worker') {
+    // GET WORKER PROFILE
+    const {
+      data: workerProfile,
+      error: profileError,
+    } = await supabase
+      .from('profiles')
+      .select('area')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      throw profileError;
+    }
+
+    // ONLY SAME AREA COMPLAINTS
+    query = query.eq(
+      'area',
+      workerProfile.area
+    );
+  }
+
+  // 👑 ADMIN SEES EVERYTHING
+
   const { data, error } =
-    await supabase
-      .from('complaints')
-      .select('*')
-      .order('created_at', {
-        ascending: false,
-      });
+    await query;
 
   if (error) {
+    console.log(error);
+
     throw error;
   }
 

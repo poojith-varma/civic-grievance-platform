@@ -1,16 +1,20 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
 import {
   ActivityIndicator,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
   useColorScheme,
 } from 'react-native';
+
+import {
+  SafeAreaView,
+} from 'react-native-safe-area-context';
 
 import MapView, {
   Marker,
@@ -25,7 +29,18 @@ import {
   darkColors,
 } from '../theme/colors';
 
-export default function ComplaintMapScreen() {
+type Props = {
+  route?: {
+    params?: {
+      latitude?: number;
+      longitude?: number;
+    };
+  };
+};
+
+export default function ComplaintMapScreen({
+  route,
+}: Props) {
   const colorScheme =
     useColorScheme();
 
@@ -40,9 +55,48 @@ export default function ComplaintMapScreen() {
   const [loading, setLoading] =
     useState(true);
 
+  const mapRef =
+    useRef<MapView | null>(
+      null
+    );
+
+  const focusedLatitude =
+    route?.params?.latitude;
+
+  const focusedLongitude =
+    route?.params?.longitude;
+
   useEffect(() => {
     loadComplaints();
   }, []);
+
+  useEffect(() => {
+    if (
+      focusedLatitude &&
+      focusedLongitude &&
+      mapRef.current
+    ) {
+      mapRef.current.animateToRegion(
+        {
+          latitude:
+            focusedLatitude,
+
+          longitude:
+            focusedLongitude,
+
+          latitudeDelta:
+            0.008,
+
+          longitudeDelta:
+            0.008,
+        },
+        1000
+      );
+    }
+  }, [
+    focusedLatitude,
+    focusedLongitude,
+  ]);
 
   async function loadComplaints() {
     try {
@@ -72,6 +126,24 @@ export default function ComplaintMapScreen() {
     }
   }
 
+  const initialRegion = {
+    latitude:
+      focusedLatitude || 17.385,
+
+    longitude:
+      focusedLongitude || 78.4867,
+
+    latitudeDelta:
+      focusedLatitude
+        ? 0.008
+        : 0.08,
+
+    longitudeDelta:
+      focusedLongitude
+        ? 0.008
+        : 0.08,
+  };
+
   if (loading) {
     return (
       <SafeAreaView
@@ -83,7 +155,12 @@ export default function ComplaintMapScreen() {
           },
         ]}
       >
-        <ActivityIndicator size="large" />
+        <ActivityIndicator
+          size="large"
+          color={
+            colors.primary
+          }
+        />
       </SafeAreaView>
     );
   }
@@ -99,13 +176,11 @@ export default function ComplaintMapScreen() {
       ]}
     >
       <MapView
+        ref={mapRef}
         style={styles.map}
-        initialRegion={{
-          latitude: 17.385,
-          longitude: 78.4867,
-          latitudeDelta: 0.08,
-          longitudeDelta: 0.08,
-        }}
+        initialRegion={
+          initialRegion
+        }
       >
         {complaints.map(
           (complaint) => {
@@ -138,8 +213,24 @@ export default function ComplaintMapScreen() {
             );
           }
         )}
+
+        {/* FOCUSED MARKER */}
+        {focusedLatitude &&
+          focusedLongitude && (
+            <Marker
+              coordinate={{
+                latitude:
+                  focusedLatitude,
+                longitude:
+                  focusedLongitude,
+              }}
+              title="Selected Complaint"
+              pinColor="#4F7CFF"
+            />
+          )}
       </MapView>
 
+      {/* PREMIUM HEADER */}
       <View
         style={[
           styles.header,
@@ -158,7 +249,7 @@ export default function ComplaintMapScreen() {
             },
           ]}
         >
-          Civic Complaint Map
+          🗺️ Civic Complaint Map
         </Text>
 
         <View style={styles.legend}>
@@ -251,68 +342,72 @@ export default function ComplaintMapScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
-  map: {
-    flex: 1,
-  },
-
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  header: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    right: 20,
-
-    padding: 16,
-    borderRadius: 16,
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
+const styles =
+  StyleSheet.create({
+    container: {
+      flex: 1,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
 
-    elevation: 4,
-  },
+    map: {
+      flex: 1,
+    },
 
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
+    center: {
+      flex: 1,
+      justifyContent:
+        'center',
+      alignItems:
+        'center',
+    },
 
-  legend: {
-    flexDirection: 'row',
-    justifyContent:
-      'space-around',
-  },
+    header: {
+      position: 'absolute',
+      top: 60,
+      left: 20,
+      right: 20,
 
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+      padding: 18,
+      borderRadius: 24,
 
-  legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 6,
-  },
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 6,
+      },
 
-  legendText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-});
+      shadowOpacity: 0.12,
+      shadowRadius: 12,
+
+      elevation: 8,
+    },
+
+    headerTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      textAlign: 'center',
+      marginBottom: 14,
+    },
+
+    legend: {
+      flexDirection: 'row',
+      justifyContent:
+        'space-around',
+    },
+
+    legendItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+
+    legendDot: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      marginRight: 6,
+    },
+
+    legendText: {
+      fontSize: 12,
+      fontWeight: '600',
+    },
+  });

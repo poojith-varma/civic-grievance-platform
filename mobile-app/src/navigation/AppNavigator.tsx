@@ -15,9 +15,13 @@ import LoginScreen from '../screens/LoginScreen';
 
 import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
 
+import ComplaintMapScreen from '../screens/ComplaintMapScreen';
+
 import ProfileScreen from '../screens/ProfileScreen';
 
 import RoleBasedTabs from './RoleBasedTabs';
+
+import NotificationScreen from '../screens/NotificationScreen';
 
 import {
   getCurrentSession,
@@ -117,6 +121,17 @@ export default function AppNavigator() {
             />
 
             <Stack.Screen
+              name="ComplaintMap"
+              component={
+                ComplaintMapScreen
+              }
+              options={{
+                title:
+                  'Complaint Map',
+              }}
+            />
+
+            <Stack.Screen
               name="Profile"
               component={
                 ProfileScreen
@@ -125,6 +140,17 @@ export default function AppNavigator() {
                 title: 'Your Profile',
               }}
             />
+           
+            <Stack.Screen
+           name="Notifications"
+           component={
+             NotificationScreen
+             }
+            options={{
+             title: 'Notifications',
+          }}
+          />
+
           </>
         ) : (
           <Stack.Screen

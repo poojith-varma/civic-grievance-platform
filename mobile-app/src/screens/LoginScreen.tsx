@@ -4,13 +4,16 @@ import {
 
 import {
   Alert,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+
+import {
+  SafeAreaView,
+} from 'react-native-safe-area-context';
 
 import { Picker } from '@react-native-picker/picker';
 
@@ -64,7 +67,7 @@ export default function LoginScreen() {
       'admin' | 'worker'
     >('worker');
 
-  // 👇 AREA
+  // 👇 WORKER AREA
   const [area, setArea] =
     useState('Madhapur');
 
@@ -76,13 +79,18 @@ export default function LoginScreen() {
           ? 'citizen'
           : staffRole;
 
-      // SIGNUP
+      // ✅ SIGNUP
       if (isSignup) {
         await signUp(
           email,
           password,
           selectedRole,
-          area
+
+          // ✅ ONLY WORKERS GET AREA
+          selectedRole ===
+            'worker'
+            ? area
+            : null
         );
 
         Alert.alert(
@@ -95,7 +103,7 @@ export default function LoginScreen() {
         return;
       }
 
-      // LOGIN
+      // ✅ LOGIN
       await signIn(
         email,
         password
@@ -103,6 +111,25 @@ export default function LoginScreen() {
 
       const role =
         await getUserRole();
+
+      const allowedRole =
+        portalType ===
+        'citizen'
+          ? 'citizen'
+          : staffRole;
+
+      // 🚨 BLOCK WRONG PORTAL LOGIN
+      if (
+        role !==
+        allowedRole
+      ) {
+        Alert.alert(
+          'Access Denied',
+          `Invalid credentials for ${allowedRole} portal`
+        );
+
+        return;
+      }
 
       setRole(
         role || 'citizen'
@@ -183,8 +210,7 @@ export default function LoginScreen() {
 
         {/* STAFF ROLE */}
         {portalType ===
-          'staff' &&
-          isSignup && (
+          'staff' && (
             <View
               style={
                 styles.roleContainer
@@ -242,72 +268,76 @@ export default function LoginScreen() {
             </View>
           )}
 
-        {/* AREA PICKER */}
-        {isSignup && (
-          <>
-            <Text
-              style={
-                styles.areaLabel
-              }
-            >
-              Select Area
-            </Text>
-
-            <View
-              style={
-                styles.pickerContainer
-              }
-            >
-              <Picker
-                selectedValue={
-                  area
-                }
-                onValueChange={(
-                  itemValue
-                ) =>
-                  setArea(
-                    itemValue
-                  )
+        {/* AREA PICKER ONLY FOR WORKERS */}
+        {isSignup &&
+          portalType ===
+            'staff' &&
+          staffRole ===
+            'worker' && (
+            <>
+              <Text
+                style={
+                  styles.areaLabel
                 }
               >
-                <Picker.Item
-                  label="Madhapur"
-                  value="Madhapur"
-                />
+                Select Area
+              </Text>
 
-                <Picker.Item
-                  label="Kukatpally"
-                  value="Kukatpally"
-                />
+              <View
+                style={
+                  styles.pickerContainer
+                }
+              >
+                <Picker
+                  selectedValue={
+                    area
+                  }
+                  onValueChange={(
+                    itemValue
+                  ) =>
+                    setArea(
+                      itemValue
+                    )
+                  }
+                >
+                  <Picker.Item
+                    label="Madhapur"
+                    value="Madhapur"
+                  />
 
-                <Picker.Item
-                  label="Kompally"
-                  value="Kompally"
-                />
+                  <Picker.Item
+                    label="Kukatpally"
+                    value="Kukatpally"
+                  />
 
-                <Picker.Item
-                  label="Gachibowli"
-                  value="Gachibowli"
-                />
+                  <Picker.Item
+                    label="Kompally"
+                    value="Kompally"
+                  />
 
-                <Picker.Item
-                  label="Ameerpet"
-                  value="Ameerpet"
-                />
+                  <Picker.Item
+                    label="Gachibowli"
+                    value="Gachibowli"
+                  />
 
-                <Picker.Item
-                  label="Miyapur"
-                  value="Miyapur"
-                />
+                  <Picker.Item
+                    label="Ameerpet"
+                    value="Ameerpet"
+                  />
 
-                <Picker.Item
-                  label="Hitech City"
-                  value="Hitech City"
-                />
-              </Picker>
-            </View>
-          </>
-        )}
+                  <Picker.Item
+                    label="Miyapur"
+                    value="Miyapur"
+                  />
+
+                  <Picker.Item
+                    label="Hitech City"
+                    value="Hitech City"
+                  />
+                </Picker>
+              </View>
+            </>
+          )}
 
         <TextInput
           placeholder="Email"
@@ -377,6 +407,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
+
     shadowOpacity: 0.08,
     shadowRadius: 6,
 

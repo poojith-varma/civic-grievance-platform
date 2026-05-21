@@ -7,13 +7,16 @@ import {
   Alert,
   Button,
   Image,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+
+import {
+  SafeAreaView,
+} from 'react-native-safe-area-context';
 
 import { Picker } from '@react-native-picker/picker';
 
@@ -73,7 +76,7 @@ export default function ProfileScreen() {
       const result =
         await ImagePicker.launchImageLibraryAsync({
           mediaTypes:
-            ImagePicker.MediaTypeOptions.Images,
+            ['images'],
 
           quality: 0.7,
         });
@@ -117,7 +120,12 @@ export default function ProfileScreen() {
         profile_image:
           profile.profile_image,
 
-        area: profile.area,
+        // ✅ ONLY SAVE AREA FOR WORKERS
+        area:
+          profile.role ===
+          'worker'
+            ? profile.area
+            : null,
       });
 
       Alert.alert(
@@ -151,6 +159,7 @@ export default function ProfileScreen() {
       <ScrollView
         contentContainerStyle={{
           padding: 20,
+          paddingBottom: 120,
         }}
       >
         <View style={styles.card}>
@@ -252,65 +261,76 @@ export default function ProfileScreen() {
             editable={false}
           />
 
-          <Text style={styles.label}>
-            Area
-          </Text>
+          {/* ✅ AREA ONLY FOR WORKERS */}
+          {profile.role ===
+            'worker' && (
+            <>
+              <Text
+                style={
+                  styles.label
+                }
+              >
+                Area
+              </Text>
 
-          <View
-            style={
-              styles.pickerContainer
-            }
-          >
-            <Picker
-              selectedValue={
-                profile.area ||
-                'Madhapur'
-              }
-              onValueChange={(
-                itemValue
-              ) =>
-                setProfile({
-                  ...profile,
-                  area: itemValue,
-                })
-              }
-            >
-              <Picker.Item
-                label="Madhapur"
-                value="Madhapur"
-              />
+              <View
+                style={
+                  styles.pickerContainer
+                }
+              >
+                <Picker
+                  selectedValue={
+                    profile.area ||
+                    'Madhapur'
+                  }
+                  onValueChange={(
+                    itemValue
+                  ) =>
+                    setProfile({
+                      ...profile,
+                      area:
+                        itemValue,
+                    })
+                  }
+                >
+                  <Picker.Item
+                    label="Madhapur"
+                    value="Madhapur"
+                  />
 
-              <Picker.Item
-                label="Kukatpally"
-                value="Kukatpally"
-              />
+                  <Picker.Item
+                    label="Kukatpally"
+                    value="Kukatpally"
+                  />
 
-              <Picker.Item
-                label="Kompally"
-                value="Kompally"
-              />
+                  <Picker.Item
+                    label="Kompally"
+                    value="Kompally"
+                  />
 
-              <Picker.Item
-                label="Gachibowli"
-                value="Gachibowli"
-              />
+                  <Picker.Item
+                    label="Gachibowli"
+                    value="Gachibowli"
+                  />
 
-              <Picker.Item
-                label="Ameerpet"
-                value="Ameerpet"
-              />
+                  <Picker.Item
+                    label="Ameerpet"
+                    value="Ameerpet"
+                  />
 
-              <Picker.Item
-                label="Miyapur"
-                value="Miyapur"
-              />
+                  <Picker.Item
+                    label="Miyapur"
+                    value="Miyapur"
+                  />
 
-              <Picker.Item
-                label="Hitech City"
-                value="Hitech City"
-              />
-            </Picker>
-          </View>
+                  <Picker.Item
+                    label="Hitech City"
+                    value="Hitech City"
+                  />
+                </Picker>
+              </View>
+            </>
+          )}
 
           <View
             style={{
@@ -357,6 +377,7 @@ const styles =
         width: 0,
         height: 2,
       },
+
       shadowOpacity: 0.08,
       shadowRadius: 6,
 
@@ -381,10 +402,13 @@ const styles =
       borderRadius: 60,
       backgroundColor:
         '#ddd',
+
       justifyContent:
         'center',
+
       alignItems:
         'center',
+
       marginBottom: 16,
     },
 
@@ -402,17 +426,24 @@ const styles =
     input: {
       backgroundColor:
         '#f1f3f5',
+
       padding: 16,
+
       borderRadius: 14,
+
       marginBottom: 20,
+
       fontSize: 16,
     },
 
     pickerContainer: {
       backgroundColor:
         '#f1f3f5',
+
       borderRadius: 14,
+
       marginBottom: 20,
+
       overflow: 'hidden',
     },
   });

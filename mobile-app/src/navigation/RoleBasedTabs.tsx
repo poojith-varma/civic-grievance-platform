@@ -7,6 +7,9 @@ import {
   Alert,
   TouchableOpacity,
   Image,
+  View,
+  Text,
+  useColorScheme,
 } from 'react-native';
 
 import {
@@ -39,12 +42,21 @@ import {
 } from '../services/profileService';
 
 import {
+  getUnreadCount,
+} from '../services/notificationService';
+
+import {
   useAuthStore,
 } from '../store/authStore';
 
 import {
   useRoleStore,
 } from '../store/roleStore';
+
+import {
+  lightColors,
+  darkColors,
+} from '../theme/colors';
 
 const Tab =
   createBottomTabNavigator();
@@ -57,6 +69,14 @@ export default function RoleBasedTabs() {
 
   const navigation =
     useNavigation<any>();
+
+  const colorScheme =
+    useColorScheme();
+
+  const colors =
+    colorScheme === 'dark'
+      ? darkColors
+      : lightColors;
 
   const setAuthenticated =
     useAuthStore(
@@ -71,10 +91,15 @@ export default function RoleBasedTabs() {
     string | null
   >(null);
 
-  // ✅ REFRESH IMAGE ON SCREEN FOCUS
+  const [
+    unreadCount,
+    setUnreadCount,
+  ] = useState(0);
+
   useFocusEffect(
     useCallback(() => {
       loadProfileImage();
+      loadUnreadCount();
     }, [])
   );
 
@@ -92,6 +117,19 @@ export default function RoleBasedTabs() {
       } else {
         setProfileImage(null);
       }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function loadUnreadCount() {
+    try {
+      const count =
+        await getUnreadCount();
+
+      setUnreadCount(
+        count || 0
+      );
     } catch (error) {
       console.log(error);
     }
@@ -138,44 +176,189 @@ export default function RoleBasedTabs() {
   const screenOptions = {
     headerShown: true,
 
+    headerStyle: {
+      backgroundColor:
+        colors.card,
+
+      elevation: 0,
+      shadowOpacity: 0,
+
+      borderBottomWidth: 0,
+    },
+
+    headerTitleStyle: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+    },
+
+    headerShadowVisible: false,
+
+    headerTransparent: false,
+
     headerRight: () => (
-      <TouchableOpacity
-        onPress={
-          openProfileMenu
-        }
+      <View
         style={{
-          marginRight: 16,
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginRight: 18,
         }}
       >
-        {profileImage ? (
-          <Image
-            source={{
-              uri: profileImage,
-            }}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-            }}
-          />
-        ) : (
-          <Ionicons
-            name="person-circle"
-            size={34}
-            color="#007bff"
-          />
-        )}
-      </TouchableOpacity>
+        {/* NOTIFICATION BELL */}
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(
+              'Notifications'
+            )
+          }
+          style={{
+            marginRight: 18,
+          }}
+        >
+          <View>
+            <Ionicons
+              name="notifications"
+              size={28}
+              color="#4F7CFF"
+            />
+
+            {unreadCount >
+              0 && (
+              <View
+                style={{
+                  position:
+                    'absolute',
+
+                  top: -6,
+                  right: -8,
+
+                  backgroundColor:
+                    '#EF4444',
+
+                  borderRadius: 20,
+
+                  minWidth: 20,
+                  height: 20,
+
+                  justifyContent:
+                    'center',
+
+                  alignItems:
+                    'center',
+
+                  paddingHorizontal: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 11,
+                    fontWeight: '700',
+                  }}
+                >
+                  {
+                    unreadCount
+                  }
+                </Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+
+        {/* PROFILE */}
+        <TouchableOpacity
+          onPress={
+            openProfileMenu
+          }
+        >
+          {profileImage ? (
+            <Image
+              source={{
+                uri: profileImage,
+              }}
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: 21,
+
+                borderWidth: 2,
+                borderColor:
+                  '#7BA7FF',
+              }}
+            />
+          ) : (
+            <Ionicons
+              name="person-circle"
+              size={40}
+              color="#4F7CFF"
+            />
+          )}
+        </TouchableOpacity>
+      </View>
     ),
 
-    tabBarStyle: {
-      height: 65,
-      paddingBottom: 8,
-      paddingTop: 8,
-    },
+    tabBarActiveTintColor:
+      '#4F7CFF',
+
+    tabBarInactiveTintColor:
+      '#94A3B8',
+
+    tabBarShowLabel: true,
 
     tabBarLabelStyle: {
       fontSize: 11,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+
+    tabBarStyle: {
+      position: 'absolute',
+
+      left: 12,
+      right: 12,
+      bottom: 6,
+
+      height: 68,
+
+      borderRadius: 24,
+
+      backgroundColor:
+        colorScheme === 'dark'
+          ? '#111827'
+          : '#FFFFFF',
+
+      borderTopWidth: 0,
+
+      paddingTop: 6,
+      paddingBottom: 6,
+
+      shadowColor: '#000',
+
+      shadowOffset: {
+        width: 0,
+        height: 6,
+      },
+
+      shadowOpacity: 0.1,
+      shadowRadius: 14,
+
+      elevation: 10,
+    },
+
+    tabBarItemStyle: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
+    tabBarIconStyle: {
+      marginTop: 2,
+    },
+
+    sceneStyle: {
+      backgroundColor:
+        colors.background,
+
+      paddingBottom: 82,
     },
   };
 
@@ -195,10 +378,15 @@ export default function RoleBasedTabs() {
 
             tabBarIcon: ({
               color,
+              focused,
             }) => (
               <Ionicons
-                name="home"
-                size={24}
+                name={
+                  focused
+                    ? 'home'
+                    : 'home-outline'
+                }
+                size={26}
                 color={color}
               />
             ),
@@ -215,10 +403,15 @@ export default function RoleBasedTabs() {
 
             tabBarIcon: ({
               color,
+              focused,
             }) => (
               <Ionicons
-                name="add-circle"
-                size={24}
+                name={
+                  focused
+                    ? 'add-circle'
+                    : 'add-circle-outline'
+                }
+                size={28}
                 color={color}
               />
             ),
@@ -236,10 +429,15 @@ export default function RoleBasedTabs() {
 
             tabBarIcon: ({
               color,
+              focused,
             }) => (
               <Ionicons
-                name="list"
-                size={24}
+                name={
+                  focused
+                    ? 'document-text'
+                    : 'document-text-outline'
+                }
+                size={26}
                 color={color}
               />
             ),
@@ -256,10 +454,15 @@ export default function RoleBasedTabs() {
 
             tabBarIcon: ({
               color,
+              focused,
             }) => (
               <Ionicons
-                name="map"
-                size={24}
+                name={
+                  focused
+                    ? 'map'
+                    : 'map-outline'
+                }
+                size={26}
                 color={color}
               />
             ),
@@ -288,10 +491,15 @@ export default function RoleBasedTabs() {
 
             tabBarIcon: ({
               color,
+              focused,
             }) => (
               <Ionicons
-                name="construct"
-                size={24}
+                name={
+                  focused
+                    ? 'construct'
+                    : 'construct-outline'
+                }
+                size={26}
                 color={color}
               />
             ),
@@ -308,10 +516,15 @@ export default function RoleBasedTabs() {
 
             tabBarIcon: ({
               color,
+              focused,
             }) => (
               <Ionicons
-                name="map"
-                size={24}
+                name={
+                  focused
+                    ? 'map'
+                    : 'map-outline'
+                }
+                size={26}
                 color={color}
               />
             ),
@@ -337,10 +550,15 @@ export default function RoleBasedTabs() {
 
           tabBarIcon: ({
             color,
+            focused,
           }) => (
             <Ionicons
-              name="stats-chart"
-              size={24}
+              name={
+                focused
+                  ? 'stats-chart'
+                  : 'stats-chart-outline'
+              }
+              size={26}
               color={color}
             />
           ),
@@ -358,10 +576,15 @@ export default function RoleBasedTabs() {
 
           tabBarIcon: ({
             color,
+            focused,
           }) => (
             <Ionicons
-              name="list"
-              size={24}
+              name={
+                focused
+                  ? 'document-text'
+                  : 'document-text-outline'
+              }
+              size={26}
               color={color}
             />
           ),
@@ -378,10 +601,15 @@ export default function RoleBasedTabs() {
 
           tabBarIcon: ({
             color,
+            focused,
           }) => (
             <Ionicons
-              name="map"
-              size={24}
+              name={
+                focused
+                  ? 'map'
+                  : 'map-outline'
+              }
+              size={26}
               color={color}
             />
           ),

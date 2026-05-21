@@ -5,12 +5,15 @@ import React, {
 
 import {
   ActivityIndicator,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
   useColorScheme,
 } from 'react-native';
+
+import {
+  SafeAreaView,
+} from 'react-native-safe-area-context';
 
 import {
   fetchComplaints,

@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,6 +12,10 @@ import {
   View,
   useColorScheme,
 } from 'react-native';
+
+import {
+  SafeAreaView,
+} from 'react-native-safe-area-context';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -240,9 +243,11 @@ export default function CreateComplaintScreen() {
               styles.input,
               {
                 backgroundColor:
-                  '#F8FAFC',
-                color:
-                  colors.text,
+             colorScheme === 'dark'
+               ? '#1E293B'
+               : '#F8FAFC',
+
+              color: colors.text,
               },
             ]}
           />
@@ -294,9 +299,11 @@ export default function CreateComplaintScreen() {
               styles.textArea,
               {
                 backgroundColor:
-                  '#F8FAFC',
-                color:
-                  colors.text,
+                 colorScheme === 'dark'
+                 ? '#1E293B'
+                : '#F8FAFC',
+
+                color: colors.text,
               },
             ]}
             multiline
