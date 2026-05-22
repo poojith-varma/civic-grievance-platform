@@ -4,12 +4,12 @@ import {
 } from 'react';
 
 import {
-  Alert,
   TouchableOpacity,
   Image,
   View,
   Text,
   useColorScheme,
+  Modal,
 } from 'react-native';
 
 import {
@@ -96,6 +96,11 @@ export default function RoleBasedTabs() {
     setUnreadCount,
   ] = useState(0);
 
+  const [
+    profileMenuVisible,
+    setProfileMenuVisible,
+  ] = useState(false);
+
   useFocusEffect(
     useCallback(() => {
       loadProfileImage();
@@ -146,31 +151,7 @@ export default function RoleBasedTabs() {
   }
 
   function openProfileMenu() {
-    Alert.alert(
-      'Account',
-      'Choose an option',
-      [
-        {
-          text: 'Your Profile',
-          onPress: () =>
-            navigation.navigate(
-              'Profile'
-            ),
-        },
-
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress:
-            handleLogout,
-        },
-
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ]
-    );
+    setProfileMenuVisible(true);
   }
 
   const screenOptions = {
@@ -362,19 +343,419 @@ export default function RoleBasedTabs() {
     },
   };
 
+  const ProfileMenuModal = () => (
+    <Modal
+      visible={profileMenuVisible}
+      transparent
+      animationType="fade"
+      onRequestClose={() =>
+        setProfileMenuVisible(
+          false
+        )
+      }
+    >
+      <View
+        style={{
+          flex: 1,
+          backgroundColor:
+            'rgba(0,0,0,0.45)',
+
+          justifyContent:
+            'center',
+
+          alignItems:
+            'center',
+
+          padding: 24,
+        }}
+      >
+        <View
+          style={{
+            width: '100%',
+            maxWidth: 340,
+
+            backgroundColor:
+              colorScheme === 'dark'
+                ? '#1e293b'
+                : '#fff',
+
+            borderRadius: 28,
+
+            padding: 24,
+
+            shadowColor: '#000',
+
+            shadowOffset: {
+              width: 0,
+              height: 6,
+            },
+
+            shadowOpacity: 0.2,
+            shadowRadius: 12,
+
+            elevation: 12,
+          }}
+        >
+          {/* HEADER */}
+          <View
+            style={{
+              alignItems: 'center',
+              marginBottom: 24,
+            }}
+          >
+            {profileImage ? (
+              <Image
+                source={{
+                  uri: profileImage,
+                }}
+                style={{
+                  width: 84,
+                  height: 84,
+                  borderRadius: 42,
+                  marginBottom: 14,
+                  borderWidth: 3,
+                  borderColor:
+                    '#4F7CFF',
+                }}
+              />
+            ) : (
+              <Ionicons
+                name="person-circle"
+                size={86}
+                color="#4F7CFF"
+              />
+            )}
+
+            <Text
+              style={{
+                fontSize: 22,
+                fontWeight: '700',
+                color:
+                  colors.text,
+              }}
+            >
+              CivicLens Account
+            </Text>
+
+            <Text
+              style={{
+                marginTop: 4,
+                color:
+                  colorScheme ===
+                  'dark'
+                    ? '#CBD5E1'
+                    : '#64748B',
+
+                fontSize: 14,
+              }}
+            >
+              Manage your account
+            </Text>
+          </View>
+
+          {/* PROFILE */}
+          <TouchableOpacity
+            onPress={() => {
+              setProfileMenuVisible(
+                false
+              );
+
+              navigation.navigate(
+                'Profile'
+              );
+            }}
+            style={{
+              backgroundColor:
+                '#4F7CFF',
+
+              paddingVertical: 16,
+
+              borderRadius: 18,
+
+              alignItems: 'center',
+
+              marginBottom: 14,
+            }}
+          >
+            <Text
+              style={{
+                color: '#fff',
+                fontSize: 16,
+                fontWeight: '700',
+              }}
+            >
+              👤 Your Profile
+            </Text>
+          </TouchableOpacity>
+
+          {/* LOGOUT */}
+          <TouchableOpacity
+            onPress={() => {
+              setProfileMenuVisible(
+                false
+              );
+
+              handleLogout();
+            }}
+            style={{
+              backgroundColor:
+                '#EF4444',
+
+              paddingVertical: 16,
+
+              borderRadius: 18,
+
+              alignItems: 'center',
+
+              marginBottom: 14,
+            }}
+          >
+            <Text
+              style={{
+                color: '#fff',
+                fontSize: 16,
+                fontWeight: '700',
+              }}
+            >
+              🔒 Logout
+            </Text>
+          </TouchableOpacity>
+
+          {/* CANCEL */}
+          <TouchableOpacity
+            onPress={() =>
+              setProfileMenuVisible(
+                false
+              )
+            }
+            style={{
+              backgroundColor:
+                colorScheme ===
+                'dark'
+                  ? '#334155'
+                  : '#F1F5F9',
+
+              paddingVertical: 16,
+
+              borderRadius: 18,
+
+              alignItems: 'center',
+            }}
+          >
+            <Text
+              style={{
+                color:
+                  colors.text,
+                fontSize: 16,
+                fontWeight: '700',
+              }}
+            >
+              ✖ Cancel
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
   // 👤 CITIZEN
   if (role === 'citizen') {
     return (
+      <>
+        <ProfileMenuModal />
+
+        <Tab.Navigator
+          screenOptions={
+            screenOptions
+          }
+        >
+          <Tab.Screen
+            name="HomeTab"
+            component={
+              HomeScreen
+            }
+            options={{
+              title: 'Home',
+
+              tabBarIcon: ({
+                color,
+                focused,
+              }) => (
+                <Ionicons
+                  name={
+                    focused
+                      ? 'home'
+                      : 'home-outline'
+                  }
+                  size={26}
+                  color={color}
+                />
+              ),
+            }}
+          />
+
+          <Tab.Screen
+            name="CreateComplaint"
+            component={
+              CreateComplaintScreen
+            }
+            options={{
+              title: 'Create',
+
+              tabBarIcon: ({
+                color,
+                focused,
+              }) => (
+                <Ionicons
+                  name={
+                    focused
+                      ? 'add-circle'
+                      : 'add-circle-outline'
+                  }
+                  size={28}
+                  color={color}
+                />
+              ),
+            }}
+          />
+
+          <Tab.Screen
+            name="ComplaintList"
+            component={
+              ComplaintListScreen
+            }
+            options={{
+              title:
+                'Complaints',
+
+              tabBarIcon: ({
+                color,
+                focused,
+              }) => (
+                <Ionicons
+                  name={
+                    focused
+                      ? 'document-text'
+                      : 'document-text-outline'
+                  }
+                  size={26}
+                  color={color}
+                />
+              ),
+            }}
+          />
+
+          <Tab.Screen
+            name="ComplaintMap"
+            component={
+              ComplaintMapScreen
+            }
+            options={{
+              title: 'Map',
+
+              tabBarIcon: ({
+                color,
+                focused,
+              }) => (
+                <Ionicons
+                  name={
+                    focused
+                      ? 'map'
+                      : 'map-outline'
+                  }
+                  size={26}
+                  color={color}
+                />
+              ),
+            }}
+          />
+        </Tab.Navigator>
+      </>
+    );
+  }
+
+  // 🛠️ WORKER
+  if (role === 'worker') {
+    return (
+      <>
+        <ProfileMenuModal />
+
+        <Tab.Navigator
+          screenOptions={
+            screenOptions
+          }
+        >
+          <Tab.Screen
+            name="WorkerTasks"
+            component={
+              ComplaintListScreen
+            }
+            options={{
+              title:
+                'Complaints',
+
+              tabBarIcon: ({
+                color,
+                focused,
+              }) => (
+                <Ionicons
+                  name={
+                    focused
+                      ? 'construct'
+                      : 'construct-outline'
+                  }
+                  size={26}
+                  color={color}
+                />
+              ),
+            }}
+          />
+
+          <Tab.Screen
+            name="WorkerMap"
+            component={
+              ComplaintMapScreen
+            }
+            options={{
+              title: 'Map',
+
+              tabBarIcon: ({
+                color,
+                focused,
+              }) => (
+                <Ionicons
+                  name={
+                    focused
+                      ? 'map'
+                      : 'map-outline'
+                  }
+                  size={26}
+                  color={color}
+                />
+              ),
+            }}
+          />
+        </Tab.Navigator>
+      </>
+    );
+  }
+
+  // 👑 ADMIN
+  return (
+    <>
+      <ProfileMenuModal />
+
       <Tab.Navigator
         screenOptions={
           screenOptions
         }
       >
         <Tab.Screen
-          name="HomeTab"
+          name="AdminDashboard"
           component={HomeScreen}
           options={{
-            title: 'Home',
+            title:
+              'Dashboard',
 
             tabBarIcon: ({
               color,
@@ -383,8 +764,8 @@ export default function RoleBasedTabs() {
               <Ionicons
                 name={
                   focused
-                    ? 'home'
-                    : 'home-outline'
+                    ? 'stats-chart'
+                    : 'stats-chart-outline'
                 }
                 size={26}
                 color={color}
@@ -394,32 +775,7 @@ export default function RoleBasedTabs() {
         />
 
         <Tab.Screen
-          name="CreateComplaint"
-          component={
-            CreateComplaintScreen
-          }
-          options={{
-            title: 'Create',
-
-            tabBarIcon: ({
-              color,
-              focused,
-            }) => (
-              <Ionicons
-                name={
-                  focused
-                    ? 'add-circle'
-                    : 'add-circle-outline'
-                }
-                size={28}
-                color={color}
-              />
-            ),
-          }}
-        />
-
-        <Tab.Screen
-          name="ComplaintList"
+          name="AllComplaints"
           component={
             ComplaintListScreen
           }
@@ -445,7 +801,7 @@ export default function RoleBasedTabs() {
         />
 
         <Tab.Screen
-          name="ComplaintMap"
+          name="AdminMap"
           component={
             ComplaintMapScreen
           }
@@ -469,152 +825,6 @@ export default function RoleBasedTabs() {
           }}
         />
       </Tab.Navigator>
-    );
-  }
-
-  // 🛠️ WORKER
-  if (role === 'worker') {
-    return (
-      <Tab.Navigator
-        screenOptions={
-          screenOptions
-        }
-      >
-        <Tab.Screen
-          name="WorkerTasks"
-          component={
-            ComplaintListScreen
-          }
-          options={{
-            title:
-              'Complaints',
-
-            tabBarIcon: ({
-              color,
-              focused,
-            }) => (
-              <Ionicons
-                name={
-                  focused
-                    ? 'construct'
-                    : 'construct-outline'
-                }
-                size={26}
-                color={color}
-              />
-            ),
-          }}
-        />
-
-        <Tab.Screen
-          name="WorkerMap"
-          component={
-            ComplaintMapScreen
-          }
-          options={{
-            title: 'Map',
-
-            tabBarIcon: ({
-              color,
-              focused,
-            }) => (
-              <Ionicons
-                name={
-                  focused
-                    ? 'map'
-                    : 'map-outline'
-                }
-                size={26}
-                color={color}
-              />
-            ),
-          }}
-        />
-      </Tab.Navigator>
-    );
-  }
-
-  // 👑 ADMIN
-  return (
-    <Tab.Navigator
-      screenOptions={
-        screenOptions
-      }
-    >
-      <Tab.Screen
-        name="AdminDashboard"
-        component={HomeScreen}
-        options={{
-          title:
-            'Dashboard',
-
-          tabBarIcon: ({
-            color,
-            focused,
-          }) => (
-            <Ionicons
-              name={
-                focused
-                  ? 'stats-chart'
-                  : 'stats-chart-outline'
-              }
-              size={26}
-              color={color}
-            />
-          ),
-        }}
-      />
-
-      <Tab.Screen
-        name="AllComplaints"
-        component={
-          ComplaintListScreen
-        }
-        options={{
-          title:
-            'Complaints',
-
-          tabBarIcon: ({
-            color,
-            focused,
-          }) => (
-            <Ionicons
-              name={
-                focused
-                  ? 'document-text'
-                  : 'document-text-outline'
-              }
-              size={26}
-              color={color}
-            />
-          ),
-        }}
-      />
-
-      <Tab.Screen
-        name="AdminMap"
-        component={
-          ComplaintMapScreen
-        }
-        options={{
-          title: 'Map',
-
-          tabBarIcon: ({
-            color,
-            focused,
-          }) => (
-            <Ionicons
-              name={
-                focused
-                  ? 'map'
-                  : 'map-outline'
-              }
-              size={26}
-              color={color}
-            />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+    </>
   );
 }
