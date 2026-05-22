@@ -33,6 +33,39 @@ The goal of CivicLens is to improve transparency, civic engagement, and communic
 
 ---
 
+
+# 🌍 Why CivicLens?
+
+CivicLens was created to address a common problem faced in many communities — the difficulty citizens experience when trying to report and track civic issues efficiently.
+
+Problems like:
+- damaged roads
+- garbage accumulation
+- drainage issues
+- broken street lights
+- public infrastructure complaints
+
+often go unnoticed or unresolved due to poor communication channels.
+
+CivicLens aims to simplify this process by providing a modern digital platform where citizens can easily:
+- report issues
+- upload evidence
+- share locations
+- track complaint progress
+- improve transparency and accountability
+
+The project was built as an initiative to explore how technology can improve civic engagement and contribute toward smarter and more connected communities.
+
+---
+
+<div align="center">
+
+⭐ If you like CivicLens, consider starring the repository ⭐
+
+</div>
+
+---
+
 # 🚀 Core Features
 
 - 📸 Complaint Reporting System
@@ -73,36 +106,6 @@ The goal of CivicLens is to improve transparency, civic engagement, and communic
 
 ---
 
-# 👨‍💻 Developer - Poojith
+# 👨‍💻 Developer - Poojith Varma
 
 ---
-
-# 🌍 Why CivicLens?
-
-CivicLens was created to address a common problem faced in many communities — the difficulty citizens experience when trying to report and track civic issues efficiently.
-
-Problems like:
-- damaged roads
-- garbage accumulation
-- drainage issues
-- broken street lights
-- public infrastructure complaints
-
-often go unnoticed or unresolved due to poor communication channels.
-
-CivicLens aims to simplify this process by providing a modern digital platform where citizens can easily:
-- report issues
-- upload evidence
-- share locations
-- track complaint progress
-- improve transparency and accountability
-
-The project was built as an initiative to explore how technology can improve civic engagement and contribute toward smarter and more connected communities.
-
----
-
-<div align="center">
-
-⭐ If you like CivicLens, consider starring the repository ⭐
-
-</div>
