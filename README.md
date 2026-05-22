@@ -39,6 +39,9 @@ The goal of CivicLens is to improve transparency, civic engagement, and communic
 - 🗺️ Interactive Complaint Maps
 - 🔐 Authentication & Session Management
 - ☁️ Cloud Image Uploads
+- 🔔 Push Notifications
+- 📊 Admin Analytics Dashboard
+- 👨‍💼 Role-Based Access Control
 - 🌙 Dark / Light Mode
 - 📱 Modern Mobile UI
 - ⚡ Real-time Friendly Architecture
